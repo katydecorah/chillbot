@@ -1,0 +1,167 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Parameters": {
+    "GitSha": {
+      "Type": "String",
+      "Description": "GitSha to deploy"
+    },
+    "SlackChannel": {
+      "Type": "String",
+      "Description": "Slack channel for posting the chill message.",
+      "Default": "#general"
+    },
+    "SlackHookURL": {
+      "Type": "String",
+      "Description": "Webhook URL to which to post the chill messages",
+      "Default": ""
+    },
+    "GithubAccessToken": {
+      "Type": "String",
+      "Description": "Your Github access token to authenticate the request",
+      "Default": ""
+    },
+    "GithubUsername": {
+      "Type": "String",
+      "Description": "Your Github username",
+      "Default": ""
+    },
+    "Streak": {
+      "Type": "Number",
+      "Description": "Number of days you'd like to break",
+      "Default": "7"
+    }
+  },
+  "Resources": {
+    "ChillBotRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "Path": "/chillbot/",
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "lambda.amazonaws.com"
+              },
+              "Action": "sts:AssumeRole"
+            }
+          ]
+        },
+        "Policies": [
+          {
+            "PolicyName": "CloudWatch",
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "logs:*"
+                  ],
+                  "Resource": "arn:aws:logs:*:*:*"
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "ChillBotFunction": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Fn::Join": [
+              "",
+              [
+                "kdecorah-",
+                {
+                  "Ref": "AWS::Region"
+                }
+              ]
+            ]
+          },
+          "S3Key": {
+            "Fn::Join": [
+              "",
+              [
+                "chillbot/",
+                {
+                  "Ref": "GitSha"
+                },
+                ".zip"
+              ]
+            ]
+          }
+        },
+        "Role": {
+          "Fn::GetAtt": [
+            "ChillBotRole",
+            "Arn"
+          ]
+        },
+        "Environment": {
+          "Variables": {
+            "SlackChannel": {
+              "Ref": "SlackChannel"
+            },
+            "SlackHookURL": {
+              "Ref": "SlackHookURL"
+            },
+            "GithubAccessToken": {
+              "Ref": "GithubAccessToken"
+            },
+            "GithubUsername": {
+              "Ref": "GithubUsername"
+            },
+            "Streak": {
+              "Ref": "Streak"
+            }
+          }
+        },
+        "Description": "chill",
+        "Handler": "index.chill",
+        "MemorySize": 128,
+        "Runtime": "nodejs4.3",
+        "Timeout": 300
+      }
+    },
+    "TriggerChillBotFunctionEveryWeekend": {
+      "Type": "AWS::Events::Rule",
+      "Properties": {
+        "Description": "7 am EST every weekend",
+        "ScheduleExpression": "cron(0 11 ? * SAT,SUN *)",
+        "State": "ENABLED",
+        "Targets": [
+          {
+            "Arn": {
+              "Fn::GetAtt": [
+                "ChillBotFunction",
+                "Arn"
+              ]
+            },
+            "Id": "TriggerChillBotFunctionEveryWeekend"
+          }
+        ]
+      }
+    },
+    "TriggerChillBotFunctionEveryWeekendPermission": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "ChillBotFunction",
+            "Arn"
+          ]
+        },
+        "Principal": "events.amazonaws.com",
+        "SourceArn": {
+          "Fn::GetAtt": [
+            "TriggerChillBotFunctionEveryWeekend",
+            "Arn"
+          ]
+        }
+      }
+    }
+  }
+}

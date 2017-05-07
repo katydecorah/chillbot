@@ -1,0 +1,34 @@
+{
+  "name": "chillbot",
+  "version": "1.0.0",
+  "description": "A Slack bot that will help you break your GitHub contribution streak and idk do something else like read a book or go outside.",
+  "main": "index.js",
+  "author": "Katy DeCorah",
+  "engines": {
+    "node": "4.4.3"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/katydecorah/chillbot.git"
+  },
+  "bugs": {
+    "url": "https://github.com/katydecorah/chillbot/issues"
+  },
+  "license": "MIT",
+  "scripts": {
+    "lint": "eslint .",
+    "test": "tape test/*.js"
+  },
+  "dependencies": {
+    "babel-eslint": "^7.2.3",
+    "eslint": "^3.19.0",
+    "minimist": "^1.2.0",
+    "moment": "^2.17.1",
+    "request": "^2.81.0",
+    "tape": "^4.6.3",
+    "underscore": "^1.8.3"
+  },
+  "bin": {
+    "chillbot": "./bin/chillbot.js"
+  }
+}
