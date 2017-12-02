@@ -13,10 +13,11 @@ test('[chillbot] success streak', (assert) => {
   process.env.EventsJSON = JSON.stringify(streak);
 
   const originalPost = chillbot.post;
-  chillbot.post = (message, callback) => {
+  chillbot.post = (message) => {
     assert.equal(message, 'Your GitHub contribution streak is 7 days 🙀\n\n*Time to take a break!*');
-    assert.equal(typeof callback, 'function');
-    return callback(null, 'success');
+    return new Promise(resolve => {
+      resolve('success');
+    });
   };
 
   chillbot.chill({}, null, (err, res) => {
@@ -54,15 +55,16 @@ test('[chillbot] exclude events, streak', (assert) => {
   process.env.ExcludeEvents = ['IssueCommentEvent'];
 
   const originalPost = chillbot.post;
-  chillbot.post = (message, callback) => {
+  chillbot.post = (message) => {
     assert.equal(message, 'Your GitHub contribution streak is 7 days 🙀\n\n*Time to take a break!*');
-    assert.equal(typeof callback, 'function');
-    return callback(null, 'success');
+    return new Promise(resolve => {
+      resolve('success');
+    });
   };
 
   chillbot.chill({}, null, (err, res) => {
     assert.ifError(err, 'Should not error');
-    assert.deepEqual(res, 'success', 'Success message from post() should appear in callback');
+    assert.deepEqual(res, 'success');
     chillbot.post = originalPost;
     assert.end();
   });

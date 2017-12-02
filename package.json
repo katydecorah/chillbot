@@ -5,7 +5,7 @@
   "main": "index.js",
   "author": "Katy DeCorah",
   "engines": {
-    "node": "4.4.3"
+    "node": "6.10.3"
   },
   "repository": {
     "type": "git",
@@ -23,9 +23,9 @@
     "babel-eslint": "^7.2.3",
     "eslint": "^3.19.0",
     "minimist": "^1.2.0",
-    "moment": "^2.17.1",
-    "request": "^2.81.0",
-    "tape": "^4.6.3",
+    "moment": "^2.19.2",
+    "request": "^2.83.0",
+    "tape": "^4.8.0",
     "underscore": "^1.8.3"
   },
   "bin": {
