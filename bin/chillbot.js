@@ -5,8 +5,12 @@ const chillbot = require('../index.js');
 const argv = require('minimist')(process.argv.slice(2));
 
 if (!argv.github || !argv.streak || !argv.channel) {
-  console.log('Usage:   chillbot --channel=<Slack channel> --github=<Github username> --streak=<Number of days>');
-  console.log('Example: chillbot --channel=@katydecorah --github=katydecorah --streak=7');
+  console.log(
+    'Usage:   chillbot --channel=<Slack channel> --github=<Github username> --streak=<Number of days>'
+  );
+  console.log(
+    'Example: chillbot --channel=@katydecorah --github=katydecorah --streak=7'
+  );
   process.exit(1);
 }
 
